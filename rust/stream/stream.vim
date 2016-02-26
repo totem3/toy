@@ -7,6 +7,7 @@ function! Handler(chan, msg) abort
     exe wn 'wincmd w'
     1put!=a:msg
   endfor
+  wincmd p
   redraw
 endfunction
 
