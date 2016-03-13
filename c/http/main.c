@@ -7,6 +7,10 @@
 #include <strings.h>
 #include <unistd.h>
 
+#define DEBUG 0
+#define debug_print(fmt, ...) \
+    do { if (DEBUG) fprintf(stderr, fmt, ##__VA_ARGS__); } while(0)
+
 void error(char *msg)
 {
     perror(msg);
@@ -40,7 +44,7 @@ int main(int argc, char const* argv[])
     if (sockfd < 0)
         error("ERROR opening socket");
 
-    printf("sock open: %d\n", sockfd);
+    debug_print("sock open: %d\n", sockfd);
 
     // parse argv[1]
     int ret = sscanf(argv[1],
@@ -63,10 +67,10 @@ int main(int argc, char const* argv[])
     if (portno == 0) {
         portno = 80;
     }
-    printf("scheme: %s\n", scheme);
-    printf("hostname: %s\n", hostname);
-    printf("path: %s\n", path);
-    printf("portno: %d\n", portno);
+    debug_print("scheme: %s\n", scheme);
+    debug_print("hostname: %s\n", hostname);
+    debug_print("path: %s\n", path);
+    debug_print("portno: %d\n", portno);
 
     server = gethostbyname(hostname);
     if (server == NULL) {
@@ -79,21 +83,22 @@ int main(int argc, char const* argv[])
     serv_addr.sin_family = AF_INET;
     memcpy((char *) &serv_addr.sin_addr.s_addr, (char *) server->h_addr, server->h_length);
     serv_addr.sin_port = htons(portno);
-    printf("%d\n", *server->h_addr);
+    debug_print("%d\n", *server->h_addr);
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
         error("ERROR connecting");
     }
-    printf("connect\n");
+
+    debug_print("connect\n");
     memset(buffer, 0, BUFLEN);
     char message[100];
     sprintf(message, "GET / HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", hostname);
-    printf("message = %s\n", message);
+    debug_print("message = %s\n", message);
     n = write(sockfd, message, strlen(message));
-    printf("write %d bytes\n", n);
+    debug_print("write %d bytes\n", n);
     if (n < 0)
         error("ERORR writing to socket");
     memset(buffer, 0, BUFLEN);
-    printf("start reading\n");
+    debug_print("start reading\n");
 
     
     char b[1];
@@ -104,7 +109,7 @@ int main(int argc, char const* argv[])
         buffer[idx++] = *b;
         strncpy(chk, &buffer[idx-4], 4);
         if (strncmp(chk, "\r\n\r\n", 4) == 0) {
-            printf("DONE\n");
+            debug_print("DONE\n");
             break;
         }
     }
@@ -118,7 +123,7 @@ int main(int argc, char const* argv[])
         error("ERROR reading from socket");
         exit(1);
     }
-    printf("read %d\n", n);
+    debug_print("read %d\n", n);
     printf("%s\n", body);
     close(sockfd);
     return 0;
