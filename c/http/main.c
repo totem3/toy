@@ -82,7 +82,6 @@ int main(int argc, char const* argv[])
     serv_addr.sin_family = AF_INET;
     memcpy((char *) &serv_addr.sin_addr.s_addr, (char *) server->h_addr, server->h_length);
     serv_addr.sin_port = htons(portno);
-    debug_print("%d\n", *server->h_addr);
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
         error("ERROR connecting");
     }
