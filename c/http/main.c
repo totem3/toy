@@ -7,7 +7,7 @@
 #include <strings.h>
 #include <unistd.h>
 
-#define DEBUG 1
+#define DEBUG 0
 #define debug_print(fmt, ...) \
     do { if (DEBUG) fprintf(stderr, fmt, ##__VA_ARGS__); } while(0)
 
@@ -97,7 +97,6 @@ int main(int argc, char const* argv[])
     memset(buffer, 0, BUFLEN);
     debug_print("start reading\n");
 
-    
     char b[1];
     char chk[4];
     memset(chk, 0, 4);
@@ -143,13 +142,23 @@ int main(int argc, char const* argv[])
     char *body;
     body = (char *)malloc(content_length);
     memset(body, 0, content_length);
-    n = read(sockfd, body, content_length);
-    if (n < 0) {
-        error("ERROR reading from socket");
-        exit(1);
+    int read_length = 0;
+    while (1) {
+        n = read(sockfd, body, content_length);
+        if (n < 0) {
+            error("ERROR reading from socket");
+            break;
+        } else {
+            content_length -= n;
+        }
+        printf("%s\n", body);
+        if (content_length <= 0) {
+            read_length += n;
+            debug_print("read done\n");
+            debug_print("read length: %d\n", read_length);
+            break;
+        }
     }
-    debug_print("read %d\n", n);
-    printf("%s\n", body);
     free(body);
     close(sockfd);
     return 0;
