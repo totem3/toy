@@ -7,7 +7,7 @@
 #include <strings.h>
 #include <unistd.h>
 
-#define DEBUG 0
+#define DEBUG 1
 #define debug_print(fmt, ...) \
     do { if (DEBUG) fprintf(stderr, fmt, ##__VA_ARGS__); } while(0)
 
@@ -26,7 +26,6 @@ int main(int argc, char const* argv[])
 
     const int BUFLEN = 1024;
     char buffer[BUFLEN];
-    char body[2048];
 
     char scheme[8];
     memset(scheme, 0, 8);
@@ -117,14 +116,43 @@ int main(int argc, char const* argv[])
     printf("%s\n", buffer);
     printf("-----\n");
 
-    memset(body, 0, 2048);
-    n = read(sockfd, body, 1270);
+    int code = 0;
+    char msg[64];
+    sscanf(buffer, "HTTP/1.1 %d %s\r\n", &code, msg);
+    printf("code: %d\n", code);
+    printf("msg: %s\n", msg);
+    char *start, *end;
+    start = strchr(buffer, '\n');
+    char header_key[64];
+    memset(header_key, 0, 64);
+    char header_value[256];
+    memset(header_value, 0, 256);
+    int content_length = 0;
+
+    while (0 != (end = strchr(start, ':'))) {
+        strncpy(header_key, start, end - (start));
+        start = end + 1;
+        end = strchr(start, '\n');
+        strncpy(header_value, start, end - (start+1));
+        start = end + 1;
+        if (0 == strcmp(header_key, "Content-Length")) {
+            content_length = atoi(header_value);
+        }
+        memset(header_key, 0, 64);
+        memset(header_value, 0, 256);
+    }
+
+    char *body;
+    body = (char *)malloc(content_length);
+    memset(body, 0, content_length);
+    n = read(sockfd, body, content_length);
     if (n < 0) {
         error("ERROR reading from socket");
         exit(1);
     }
     debug_print("read %d\n", n);
     printf("%s\n", body);
+    free(body);
     close(sockfd);
     return 0;
 }
