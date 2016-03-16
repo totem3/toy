@@ -30,9 +30,16 @@ int main()
 
     while (1) {
         connfd = accept(sockfd, (struct sockaddr*)NULL, NULL);
-        write(connfd, msg, strlen(msg));
-        sleep(1);
-        close(connfd);
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("failed to fork. ");
+            /* break; */
+        } else if (pid == 0) {
+            write(connfd, msg, strlen(msg));
+            sleep(1);
+            close(connfd);
+            break;
+        }
     }
 
     close(sockfd);
