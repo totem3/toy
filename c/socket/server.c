@@ -4,10 +4,12 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int main()
 {
     int sockfd, connfd;
+    int status;
     struct sockaddr_in sockaddr;
     struct hostent *server;
 
@@ -39,6 +41,8 @@ int main()
             sleep(1);
             close(connfd);
             break;
+        } else {
+            wait(&status);
         }
     }
 
