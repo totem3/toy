@@ -5,9 +5,27 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
+
+void sig_catch(int sig) {
+    pid_t pid_child = 0;
+    do {
+        int ret_child;
+        pid_child = waitpid(-1, &ret_child, WNOHANG);
+    } while (pid_child > 0);
+}
 
 int main()
 {
+
+    struct sigaction act;
+    act.sa_handler = sig_catch;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
+    if (0 > sigaction(SIGCHLD, &act, NULL)) {
+        perror("failed to set sigaction: ");
+    }
+
     int sockfd, connfd;
     int status;
     struct sockaddr_in sockaddr;
@@ -41,8 +59,6 @@ int main()
             sleep(1);
             close(connfd);
             break;
-        } else {
-            wait(&status);
         }
     }
 
