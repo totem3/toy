@@ -39,13 +39,11 @@ int main()
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (0 > (bind(sockfd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)))) {
-        fprintf(stderr, "failed to bind\n");
-        perror("ERROR");
+        perror("failed to bind");
     }
 
     if (0 > (listen(sockfd, 10))) {
-        fprintf(stderr, "failed to listen\n");
-        perror("ERROR");
+        perror("failed to listen");
     }
 
     while (1) {
@@ -53,9 +51,14 @@ int main()
         pid_t pid = fork();
         if (pid < 0) {
             perror("failed to fork. ");
-            /* break; */
         } else if (pid == 0) {
-            write(connfd, msg, strlen(msg));
+            char send[32];
+            pid_t selfpid = getpid();
+            if (0 < sprintf(send, "[%d] %s", selfpid, msg)) {
+                write(connfd, send, strlen(send));
+            } else {
+                write(connfd, msg, strlen(msg));
+            }
             sleep(1);
             close(connfd);
             break;
