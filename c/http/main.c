@@ -88,7 +88,8 @@ int main(int argc, char const* argv[])
     debug_print("connect\n");
     memset(buffer, 0, BUFLEN);
     char message[100];
-    sprintf(message, "GET / HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", hostname);
+    /* sprintf(message, "GET / HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", hostname); */
+    sprintf(message, "GET / HTTP/1.1\r\nHost: %s\r\n\r\n", hostname);
     debug_print("message = %s\n", message);
     n = write(sockfd, message, strlen(message));
     debug_print("write %d bytes\n", n);
@@ -149,6 +150,8 @@ int main(int argc, char const* argv[])
             error("ERROR reading from socket");
             break;
         } else {
+            /* int wn = write(sockfd, message, strlen(message)); */
+            /* printf("write %d bytes\n", wn); */
             content_length -= n;
         }
         printf("%s\n", body);
@@ -160,6 +163,15 @@ int main(int argc, char const* argv[])
         }
     }
     free(body);
+    int wn = write(sockfd, message, strlen(message));
+    printf("write %d bytes\n", wn);
+    while (1) {
+        n = read(sockfd, buffer, 64);
+        printf("read %d bytes\n", n);
+        if (n <= 0) {
+            break;
+        }
+    }
     close(sockfd);
     return 0;
 }
