@@ -4,6 +4,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 int main()
@@ -24,6 +25,7 @@ int main()
     }
 
     if (0 > (connect(sockfd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)))) {
+        fprintf(stderr, "errno %d\n", errno);
         perror("ERROR connect:");
         return 1;
     }

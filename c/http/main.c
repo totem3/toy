@@ -7,7 +7,7 @@
 #include <strings.h>
 #include <unistd.h>
 
-#define DEBUG 0
+#define DEBUG 1
 #define debug_print(fmt, ...) \
     do { if (DEBUG) fprintf(stderr, fmt, ##__VA_ARGS__); } while(0)
 
@@ -87,8 +87,8 @@ int main(int argc, char const* argv[])
 
     debug_print("connect\n");
     memset(buffer, 0, BUFLEN);
-    char message[100];
-    sprintf(message, "GET / HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", hostname);
+    char message[128];
+    sprintf(message, "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nUser-Agent: hurl/0.0.1\r\n\r\n", path, hostname);
     debug_print("message = %s\n", message);
     n = write(sockfd, message, strlen(message));
     debug_print("write %d bytes\n", n);
@@ -139,19 +139,28 @@ int main(int argc, char const* argv[])
         memset(header_value, 0, 256);
     }
 
+    char readbuf[16384];
     char *body;
     body = (char *)malloc(content_length);
+    char *rstart;
     memset(body, 0, content_length);
     int read_length = 0;
+    rstart = body;
     while (1) {
-        n = read(sockfd, body, content_length);
+        printf("content_length: %d\n", content_length);
+
+        printf("F_GETFL %d\n", fcntl(sockfd, F_GETFL));
+        n = read(sockfd, readbuf, content_length);
         if (n < 0) {
             error("ERROR reading from socket");
             break;
         } else {
+            printf("read %d bytes\n", n);
             content_length -= n;
+            printf("rest %d bytes\n", content_length);
         }
-        printf("%s\n", body);
+        strncpy(rstart, readbuf, n);
+        rstart = rstart + n;
         if (content_length <= 0) {
             read_length += n;
             debug_print("read done\n");
@@ -159,6 +168,9 @@ int main(int argc, char const* argv[])
             break;
         }
     }
+    printf("F_GETFL %d\n", fcntl(sockfd, F_GETFL));
+    printf("----\n");
+    printf("%s\n", body);
     free(body);
     close(sockfd);
     return 0;
