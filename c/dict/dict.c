@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "./dict.h"
+#include <unistd.h>
 
 typedef struct tree {
   struct tree *left;
@@ -226,19 +227,26 @@ int main()
         .entry = e
     };
 
-    tree_t t;
-    insert(&dict, "hoge", 24, &t);
-    tree_t t2;
-    insert(&dict, "fuga", 31, &t2);
-    tree_t t3;
-    insert(&dict, "piyo", 72, &t3);
-    tree_t t4;
-    insert(&dict, "foo", 1064, &t4);
-    tree_t t5;
-    insert(&dict, "bar", 822, &t5);
+    int MAX = 200000;
+    tree_t t[MAX];
+    printf("sizeof tree_t %lu\n", sizeof(tree_t));
+    char keybuf[MAX][5];
+    int i;
+    for (i = 0; i < MAX; i++) {
+        /* fprintf(stderr,"%d\n", i); */
+        sprintf(keybuf[i], "key%d", i);
+        insert(&dict, keybuf[i], i, &t[i]);
+    }
+    sleep(10);
 
-    printf("31 = %d\n", get(&dict, "fuga")->value);
-    printf("822 = %d\n", get(&dict, "bar")->value);
+    printf("31 = %d\n", get(&dict, "key1")->value);
+    dict_entry_t *result;
+    result = get(&dict, "fuga");
+    if (result != NULL) {
+        printf("fuga: %d\n", result->value);
+    } else {
+        printf("value for key 'fuga' is NULL\n");
+    }
 
-    print_tree(&dict, 0);
+    /* print_tree(&dict, 0); */
 }
