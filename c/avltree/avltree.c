@@ -1,30 +1,11 @@
+#include "./avltree.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-typedef struct tree {
-    struct tree *parent;
-    struct tree *left;
-    struct tree *right;
-    int value;
-} tree_t;
-
 void set_value(tree_t *t, int value)
 {
     t->value = value;
-}
-
-void insert(tree_t *t, tree_t *t2)
-{
-    if (t->value > t2->value) {
-        t->left = t2;
-        t2->parent = t;
-    } else if (t->value < t2->value){
-        t->right = t2;
-        t2->parent = t;
-    } else {
-        t->value = t2->value;
-    }
 }
 
 void rotateR(tree_t *t)
@@ -81,6 +62,75 @@ void rotateLR(tree_t *t)
 {
     rotateL(t->left);
     rotateR(t);
+}
+
+int tree_height(tree_t *t)
+{
+    int left = 1;
+    int right = 1;
+
+    if (t == NULL) {
+        return 0;
+    }
+
+    if (t->left != NULL) {
+        left += tree_height(t->left);
+    }
+    if (t->right != NULL) {
+        right += tree_height(t->right);
+    }
+
+    return (left >= right) ? left : right;
+}
+
+int bias(tree_t *t)
+{
+    int left = tree_height(t->left);
+    int right = tree_height(t->right);
+    return left - right;
+}
+
+void insert(tree_t *t, tree_t *t2)
+{
+    if (t->value > t2->value) {
+        if (t->left == NULL) {
+            t->left = t2;
+            t2->parent = t;
+        } else {
+            insert(t->left, t2);
+            int b = bias(t);
+            if (b < -1) {
+                fprintf(stderr, "\e[32m;rotateL\e[0m;\n");
+                rotateL(t);
+            }
+            if (b > 1) {
+                fprintf(stderr, "\e[32mrotateR\e[0m\n");
+                rotateR(t);
+            }
+            if (-1 <= b && b <= 1) {
+                fprintf(stderr, "\e[32m;no rotattion\e[0m;\n");
+            }
+        }
+    } else if (t->value < t2->value) {
+        if (t->right == NULL) {
+            t->right = t2;
+            t2->parent = t;
+        } else {
+            insert(t, t2);
+            if (bias(t) < -1) {
+                rotateL(t);
+            }
+            if (bias(t) > 1) {
+                printf("\e[32m;rotateR\e[0m;\n");
+                rotateR(t);
+            }
+            if (-1 <= bias(t) && bias(t) <= 1) {
+                printf("\e[32m;no rotattion\e[0m;\n");
+            }
+        }
+    } else {
+        t->value = t2->value;
+    }
 }
 
 void print_tree(tree_t *t, int depth)
@@ -146,46 +196,13 @@ void print_tree(tree_t *t, int depth)
     }
 }
 
-int tree_height(tree_t *t)
+void traverse_tree(tree_t *t, void (*f)(tree_t *t))
 {
-    int left = 0;
-    int right = 0;
-
     if (t->left != NULL) {
-        left += tree_height(t->left);
+        traverse_tree(t->left, f);
     }
     if (t->right != NULL) {
-        right += tree_height(t->right);
+        traverse_tree(t->right, f);
     }
-
-    return (left >= right) ? left : right;
-}
-
-int bias(tree_t *t)
-{
-    int left = tree_height(t->left);
-    int right = tree_height(t->right);
-    return left - right;
-}
-
-int main()
-{
-    tree_t root = { .value = 10 };
-    tree_t left = { .value = 5 };
-    tree_t r    = { .value = 50 };
-    tree_t rl   = { .value = 30 };
-    tree_t rll  = { .value = 20 };
-    tree_t rlr  = { .value = 40 };
-    tree_t rr   = { .value = 100 };
-    insert(&root, &left);
-    insert(&root, &r);
-    insert(&r, &rl);
-    insert(&r, &rr);
-    insert(&rl, &rll);
-    insert(&rl, &rlr);
-    print_tree(&root, 0);
-    printf("--------------\n");
-    rotateRL(&root);
-    print_tree(&rl, 0);
-    return 0;
+    f(t);
 }
