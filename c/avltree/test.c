@@ -74,21 +74,15 @@ void test_insert()
     tree_t t3 = { .value = 4 };
     insert(&t1, &t2);
     insert(&t1, &t3);
-    CU_ASSERT(t2.parent == NULL);
-    printf("\nt1: %p\n", &t1);
-    printf("t1.parent %p\n", t1.parent);
-    printf("t1.left %p\n", t1.left);
-    printf("t1.right %p\n", t1.right);
-    printf("t2: %p\n", &t2);
-    printf("t2.parent %p\n", t2.parent);
-    printf("t2.left %p\n", t2.left);
-    printf("t2.right %p\n", t2.right);
-    printf("t3: %p\n", &t3);
-    printf("t3.parent %p\n", t3.parent);
-    printf("t3.left %p\n", t3.left);
-    printf("t3.right %p\n", t3.right);
     CU_ASSERT(t1.parent == &t2);
+    CU_ASSERT(t1.left == NULL);
+    CU_ASSERT(t1.right == NULL);
+    CU_ASSERT(t2.parent == NULL);
+    CU_ASSERT(t2.left == &t3);
+    CU_ASSERT(t2.right == &t1);
     CU_ASSERT(t3.parent == &t2);
+    CU_ASSERT(t3.left == NULL);
+    CU_ASSERT(t3.right == NULL);
 }
 
 int main()
@@ -96,9 +90,9 @@ int main()
     CU_pSuite suite;
     CU_initialize_registry();
     suite = CU_add_suite("avl tree suite", NULL, NULL);
-    /* CU_add_test(suite, "valid_val_tree", test_valid_avl); */
-    /* CU_add_test(suite, "valid_val_tree2", test_valid_avl2); */
-    /* CU_add_test(suite, "test tree_height", test_height); */
+    CU_add_test(suite, "valid_val_tree", test_valid_avl);
+    CU_add_test(suite, "valid_val_tree2", test_valid_avl2);
+    CU_add_test(suite, "test tree_height", test_height);
     CU_add_test(suite, "test insert", test_insert);
 
     CU_basic_run_tests();

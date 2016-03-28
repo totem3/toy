@@ -10,46 +10,42 @@ void set_value(tree_t *t, int value)
 
 void rotateR(tree_t *t)
 {
+    tree_t *parent = t->parent;
     tree_t *left = t->left;
+    tree_t *right = t->right;
+    tree_t *lr = t->left->right;
+
     if (left == NULL) {
         return;
     }
-    tree_t *parent = t->parent;
-    if (parent == NULL) {
-        left->parent = parent;
-    } else {
-        parent->right = left;
-        left->parent = parent;
-    }
-    tree_t *left_right = left->right;
-    if (left_right != NULL) {
-        t->left = left_right;
-        left_right->parent = t;
-    }
+
     left->right = t;
     t->parent = left;
+    left->parent = parent;
+    t->left = lr;
+    if (lr != NULL) {
+        lr->parent = t;
+    }
 }
 
 void rotateL(tree_t *t)
 {
+    tree_t *parent = t->parent;
+    tree_t *left = t->left;
     tree_t *right = t->right;
+    tree_t *rl = t->right->left;
+
     if (right == NULL) {
         return;
     }
-    tree_t *parent = t->parent;
-    if (parent == NULL) {
-        right->parent = parent;
-    } else {
-        parent->left = right;
-        right->parent = parent;
-    }
-    tree_t *right_left = right->left;
-    if (right_left != NULL) {
-        t->right = right_left;
-        right_left->parent = t;
-    }
+
     right->left = t;
     t->parent = right;
+    right->parent = parent;
+    t->right = rl;
+    if (rl != NULL) {
+        rl->parent = t;
+    }
 }
 
 void rotateRL(tree_t *t)
@@ -100,15 +96,10 @@ void insert(tree_t *t, tree_t *t2)
             insert(t->left, t2);
             int b = bias(t);
             if (b < -1) {
-                fprintf(stderr, "\e[32m;rotateL\e[0m;\n");
                 rotateL(t);
             }
             if (b > 1) {
-                fprintf(stderr, "\e[32mrotateR\e[0m\n");
                 rotateR(t);
-            }
-            if (-1 <= b && b <= 1) {
-                fprintf(stderr, "\e[32m;no rotattion\e[0m;\n");
             }
         }
     } else if (t->value < t2->value) {
@@ -116,16 +107,13 @@ void insert(tree_t *t, tree_t *t2)
             t->right = t2;
             t2->parent = t;
         } else {
-            insert(t, t2);
-            if (bias(t) < -1) {
+            insert(t->right, t2);
+            int b = bias(t);
+            if (b < -1) {
                 rotateL(t);
             }
-            if (bias(t) > 1) {
-                printf("\e[32m;rotateR\e[0m;\n");
+            if (b > 1) {
                 rotateR(t);
-            }
-            if (-1 <= bias(t) && bias(t) <= 1) {
-                printf("\e[32m;no rotattion\e[0m;\n");
             }
         }
     } else {
