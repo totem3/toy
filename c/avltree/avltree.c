@@ -130,7 +130,7 @@ void print_tree(tree_t *t, int depth)
     int i;
     for (i = 0; i < depth; i++) {
         char *buf = &buffer[i*2];
-        if (i == (depth - 1)) {
+        if (i == (depth)) {
             memcpy(buf, "+-", 2);
         } else {
             memcpy(buf, "| ", 2);
@@ -140,7 +140,7 @@ void print_tree(tree_t *t, int depth)
     memcpy(buf, "+ ", 2);
     buf = &buffer[i*2+2];
     char valbuf[10];
-    sprintf(valbuf, "%d", t->value);
+    sprintf(valbuf, "%s:%d", t->entry.key, t->entry.value);
     memcpy(buf, valbuf, 10);
     printf("%s\n", buffer);
     if (t->left != NULL) {
@@ -159,7 +159,7 @@ void print_tree(tree_t *t, int depth)
             memcpy(lbuf, "+-", 2);
             lbuf = &lbuffer[j*2+2];
             char lvalbuf[10];
-            sprintf(lvalbuf, "%d", t->left->value);
+            sprintf(lvalbuf, "%s:%d", t->left->entry.key, t->left->entry.value);
             memcpy(lbuf, lvalbuf, 10);
             printf("%s\n", lbuffer);
         } else {
@@ -178,7 +178,7 @@ void print_tree(tree_t *t, int depth)
             memcpy(rbuf, "+-", 2);
             rbuf = &rbuffer[j*2+2];
             char lvarbuf[10];
-            sprintf(lvarbuf, "%d", t->right->value);
+            sprintf(lvarbuf, "%s:%d", t->left->entry.key, t->right->entry.value);
             memcpy(rbuf, lvarbuf, 10);
             printf("%s\n", rbuffer);
         } else {
