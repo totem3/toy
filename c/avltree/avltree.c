@@ -3,11 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-void set_value(tree_t *t, int value)
-{
-    t->value = value;
-}
-
 void rotateR(tree_t *t)
 {
     tree_t *parent = t->parent;
