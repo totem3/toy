@@ -81,14 +81,22 @@ int bias(tree_t *t)
     return left - right;
 }
 
-void insert(tree_t *t, tree_t *t2)
+void insert(tree_t *t, entry_t entry)
 {
-    if (t->value > t2->value) {
+    tree_t *t2 = malloc(sizeof(tree_t*));
+    t2->entry = entry;
+
+    insert_tree(t, t2);
+}
+
+void insert_tree(tree_t *t, tree_t *t2)
+{
+    if (0 < strcmp(t->entry.key, t2->entry.key)) {
         if (t->left == NULL) {
             t->left = t2;
             t2->parent = t;
         } else {
-            insert(t->left, t2);
+            insert_tree(t->left, t2);
             int b = bias(t);
             if (b < -1) {
                 rotateL(t);
@@ -97,12 +105,12 @@ void insert(tree_t *t, tree_t *t2)
                 rotateR(t);
             }
         }
-    } else if (t->value < t2->value) {
+    } else if (0 > strcmp(t->entry.key, t2->entry.key)) {
         if (t->right == NULL) {
             t->right = t2;
             t2->parent = t;
         } else {
-            insert(t->right, t2);
+            insert_tree(t->right, t2);
             int b = bias(t);
             if (b < -1) {
                 rotateL(t);
@@ -112,7 +120,7 @@ void insert(tree_t *t, tree_t *t2)
             }
         }
     } else {
-        t->value = t2->value;
+        t->entry.value = t2->entry.value;
     }
 }
 
