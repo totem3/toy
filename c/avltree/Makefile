@@ -1,4 +1,4 @@
-avltree.o:
+avltree.o: avltree.c
 	clang -c -g -oavltree.o avltree.c
 
 .PHONY: test
