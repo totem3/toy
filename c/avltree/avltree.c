@@ -89,14 +89,17 @@ void insert(tree_t *t, entry_t entry)
     insert_tree(t, t2);
 }
 
-void insert_tree(tree_t *t, tree_t *t2)
+void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
 {
     if (0 < strcmp(t->entry.key, t2->entry.key)) {
         if (t->left == NULL) {
             t->left = t2;
             t2->parent = t;
+            int c = 1;
+            memcpy(change, &c, sizeof(c));
+            memcpy(v, &t, sizeof(*v));
         } else {
-            insert_tree(t->left, t2);
+            _insert_tree(t->left, t2, change, v);
             int b = bias(t);
             if (b < -1) {
                 rotateL(t);
@@ -109,8 +112,11 @@ void insert_tree(tree_t *t, tree_t *t2)
         if (t->right == NULL) {
             t->right = t2;
             t2->parent = t;
+            int c = 1;
+            memcpy(change, &c, sizeof(c));
+            memcpy(v, &t, sizeof(*v));
         } else {
-            insert_tree(t->right, t2);
+            _insert_tree(t->right, t2, change, v);
             int b = bias(t);
             if (b < -1) {
                 rotateL(t);
@@ -122,6 +128,12 @@ void insert_tree(tree_t *t, tree_t *t2)
     } else {
         t->entry.value = t2->entry.value;
     }
+}
+void insert_tree(tree_t *t, tree_t *t2)
+{
+    tree_t *v = NULL;
+    int c = 0;
+    _insert_tree(t, t2, &c, &v);
 }
 
 void print_tree(tree_t *t, int depth)
