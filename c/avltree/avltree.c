@@ -190,7 +190,7 @@ void print_tree(tree_t *t, int depth)
             memcpy(rbuf, "+-", 2);
             rbuf = &rbuffer[j*2+2];
             char lvarbuf[10];
-            sprintf(lvarbuf, "%s:%d", t->left->entry.key, t->right->entry.value);
+            sprintf(lvarbuf, "%s:%d", t->right->entry.key, t->right->entry.value);
             memcpy(rbuf, lvarbuf, 10);
             printf("%s\n", rbuffer);
         } else {
