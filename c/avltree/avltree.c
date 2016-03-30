@@ -126,17 +126,42 @@ void insert_tree(tree_t *t, tree_t *t2)
     tree_t *v = NULL;
     int c = 0;
     _insert_tree(t, t2, &c, &v);
-    // 右と左でも場合分け必要だからここではダメか
-    /* while (c) { */
-    /*     int b = bias(t); */
-    /*     if (b == 0) { */
-    /*         int f = 0; */
-    /*         memcpy(&c, &f, sizeof(c)); */
-    /*     } */
-    /*     if (b == 2) { */
-    /*         rotateR(t); */
-    /*     } */
-    /* } */
+
+    while (c) {
+        int b = bias(t);
+        int f = 0;
+        if (b == 1 || b == -1) {
+        } else if (b == 0) {
+            memcpy(&c, &f, sizeof(c));
+        } else if (b == 2) {
+            switch (bias(t->left)) {
+                case 1:
+                    rotateR(t);
+                    memcpy(&c, &f, sizeof(c));
+                    break;
+                case -1:
+                    rotateLR(t);
+                    memcpy(&c, &f, sizeof(c));
+                    break;
+            }
+        } else if (b == -2) {
+            switch (bias(t->right)) {
+                case -1:
+                    rotateL(t);
+                    memcpy(&c, &f, sizeof(c));
+                    break;
+                case 1:
+                    rotateRL(t);
+                    memcpy(&c, &f, sizeof(c));
+                    break;
+            }
+        }
+        if (t == NULL || t->parent == NULL) {
+            break;
+        }
+        t = t->parent;
+    }
+
 }
 
 void print_tree(tree_t *t, int depth)
