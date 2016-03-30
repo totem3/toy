@@ -164,7 +164,7 @@ void insert_tree(tree_t *t, tree_t *t2)
 
 }
 
-void print_tree(tree_t *t, int depth)
+void _print_tree(tree_t *t, int depth)
 {
     char buffer[depth*2+3+10];
     int i;
@@ -184,47 +184,56 @@ void print_tree(tree_t *t, int depth)
     memcpy(buf, valbuf, 10);
     printf("%s\n", buffer);
     if (t->left != NULL) {
-        if (t->left->left == NULL && t->left->right == NULL) {
-            char lbuffer[depth*2+3+10];
-            int j;
-            for (j = 0; j < depth; j++) {
-                char *lbuf = &lbuffer[j*2];
-                if (j == (depth - 1)) {
-                    memcpy(lbuf, "+-", 2);
-                } else {
-                    memcpy(lbuf, "| ", 2);
-                }
-            }
-            char *lbuf = &lbuffer[j*2];
-            memcpy(lbuf, "+-", 2);
-            lbuf = &lbuffer[j*2+2];
-            char lvalbuf[10];
-            sprintf(lvalbuf, "%s:%d", t->left->entry.key, t->left->entry.value);
-            memcpy(lbuf, lvalbuf, 10);
-            printf("%s\n", lbuffer);
-        } else {
-            print_tree(t->left, (depth+1));
-        }
+        /* if (t->left->left == NULL && t->left->right == NULL) { */
+            /* char lbuffer[depth*2+3+10]; */
+            /* int j; */
+            /* for (j = 0; j < depth; j++) { */
+            /*     char *lbuf = &lbuffer[j*2]; */
+            /*     if (j == (depth)) { */
+            /*         memcpy(lbuf, "+-", 2); */
+            /*     } else { */
+            /*         memcpy(lbuf, "| ", 2); */
+            /*     } */
+            /* } */
+            /* char *lbuf = &lbuffer[j*2]; */
+            /* memcpy(lbuf, "+-", 2); */
+            /* lbuf = &lbuffer[j*2+2]; */
+            /* char lvalbuf[10]; */
+            /* sprintf(lvalbuf, "%s:%d", t->left->entry.key, t->left->entry.value); */
+            /* memcpy(lbuf, lvalbuf, 10); */
+            /* printf("%s\n", lbuffer); */
+        /* } else { */
+            _print_tree(t->left, (depth+1));
+        /* } */
     }
     if (t->right != NULL) {
-        if (t->right->left == NULL && t->right->right == NULL) {
-            char rbuffer[depth*2+3+10];
-            int j;
-            for (j = 0; j < depth; j++) {
-                char *rbuf = &rbuffer[j*2];
-                memcpy(rbuf, "| ", 2);
-            }
-            char *rbuf = &rbuffer[j*2];
-            memcpy(rbuf, "+-", 2);
-            rbuf = &rbuffer[j*2+2];
-            char lvarbuf[10];
-            sprintf(lvarbuf, "%s:%d", t->right->entry.key, t->right->entry.value);
-            memcpy(rbuf, lvarbuf, 10);
-            printf("%s\n", rbuffer);
-        } else {
-            print_tree(t->right, (depth+1));
-        }
+        /* if (t->right->left == NULL && t->right->right == NULL) { */
+            /* char rbuffer[depth*2+3+10]; */
+            /* int j; */
+            /* for (j = 0; j < depth; j++) { */
+            /*     char *rbuf = &rbuffer[j*2]; */
+            /*     if (j == (depth)) { */
+            /*         memcpy(rbuf, "+-", 2); */
+            /*     } else { */
+            /*         memcpy(rbuf, "| ", 2); */
+            /*     } */
+            /* } */
+            /* char *rbuf = &rbuffer[j*2]; */
+            /* memcpy(rbuf, "+-", 2); */
+            /* rbuf = &rbuffer[j*2+2]; */
+            /* char lvarbuf[10]; */
+            /* sprintf(lvarbuf, "%s:%d", t->right->entry.key, t->right->entry.value); */
+            /* memcpy(rbuf, lvarbuf, 10); */
+            /* printf("%s\n", rbuffer); */
+        /* } else { */
+            _print_tree(t->right, (depth+1));
+        /* } */
     }
+}
+
+void print_tree(tree_t *t)
+{
+    _print_tree(t, 0);
 }
 
 void traverse_tree(tree_t *t, void (*f)(tree_t *t))
