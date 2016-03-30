@@ -17,6 +17,9 @@ void rotateR(tree_t *t)
     left->right = t;
     t->parent = left;
     left->parent = parent;
+    if (parent != NULL) {
+        parent->right = left;
+    }
     t->left = lr;
     if (lr != NULL) {
         lr->parent = t;
@@ -37,6 +40,9 @@ void rotateL(tree_t *t)
     right->left = t;
     t->parent = right;
     right->parent = parent;
+    if (parent != NULL) {
+        parent->left = right;
+    }
     t->right = rl;
     if (rl != NULL) {
         rl->parent = t;
