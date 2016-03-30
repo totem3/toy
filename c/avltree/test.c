@@ -8,6 +8,11 @@ void assert_avl(tree_t *t)
     CU_ASSERT(is_avl(t));
 }
 
+void print_bias(tree_t *t)
+{
+  printf("bias(t(%s=>%d)) = %d\n", t->entry.key, t->entry.value, bias(t));
+}
+
 void test_valid_avl()
 {
     tree_t root = { .entry = {.key = "b", .value = 5} };
@@ -24,32 +29,8 @@ void test_valid_avl()
     insert_tree(&root, &rll);
     insert_tree(&root, &rlr);
 
-    printf("\n---------\n");
-    printf("root(%d)\n", bias(&root));
-    print_tree(&root, 0);
-    printf("-----\n");
-    printf("l(%d)\n", bias(&l));
-    print_tree(&l, 0);
-    printf("-----\n");
-    printf("r(%d)\n", bias(&r));
-    print_tree(&r, 0);
-    printf("-----\n");
-    printf("rl(%d)\n", bias(&rl));
-    print_tree(&rl, 0);
-    printf("-----\n");
-    printf("rr(%d)\n", bias(&rr));
-    print_tree(&rr, 0);
-    printf("-----\n");
-    printf("rll(%d)\n", bias(&rll));
-    print_tree(&rll, 0);
-    printf("-----\n");
-    printf("rlr(%d)\n", bias(&rlr));
-    print_tree(&rlr, 0);
-    printf("-----\n");
-    printf("\n---------\n");
-    traverse_tree(&root, assert_avl);
-    traverse_tree(&l, assert_avl);
-    traverse_tree(&r, assert_avl);
+    print_tree(&rl);
+    traverse_tree(&rl, print_bias);
     traverse_tree(&rl, assert_avl);
     traverse_tree(&rr, assert_avl);
     traverse_tree(&rll, assert_avl);
@@ -87,9 +68,9 @@ int is_avl(tree_t *t)
 
 void test_height()
 {
-    tree_t t = { .entry = {.key = "10", .value = 10 } };
-    tree_t t2 = { .entry = {.key = "5", .value = 5 } };
-    tree_t t3 = { .entry = {.key = "15", .value = 15 } };
+    tree_t t = { .entry = {.key = "b", .value = 10 } };
+    tree_t t2 = { .entry = {.key = "a", .value = 5 } };
+    tree_t t3 = { .entry = {.key = "c", .value = 15 } };
     CU_ASSERT(1 == tree_height(&t));
     insert_tree(&t, &t2);
     CU_ASSERT(2 == tree_height(&t));
