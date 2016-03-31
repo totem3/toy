@@ -87,7 +87,7 @@ int bias(tree_t *t)
     return left - right;
 }
 
-void insert(tree_t *t, entry_t entry)
+void insert(tree_t *t, entry_t *entry)
 {
     tree_t *t2 = malloc(sizeof(tree_t*));
     t2->entry = entry;
@@ -97,7 +97,12 @@ void insert(tree_t *t, entry_t entry)
 
 void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
 {
-    if (0 < strcmp(t->entry.key, t2->entry.key)) {
+    if (t->entry == NULL || 0 == strcmp(t->entry->key, t2->entry->key)) {
+        entry_t *e = malloc(sizeof(*e));
+        e->key = t2->entry->key;
+        e->value = t2->entry->value;
+        t->entry = e;
+    } else if (0 < strcmp(t->entry->key, t2->entry->key)) {
         if (t->left == NULL) {
             t->left = t2;
             t2->parent = t;
@@ -107,7 +112,7 @@ void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
         } else {
             _insert_tree(t->left, t2, change, v);
         }
-    } else if (0 > strcmp(t->entry.key, t2->entry.key)) {
+    } else if (0 > strcmp(t->entry->key, t2->entry->key)) {
         if (t->right == NULL) {
             t->right = t2;
             t2->parent = t;
@@ -118,7 +123,6 @@ void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
             _insert_tree(t->right, t2, change, v);
         }
     } else {
-        t->entry.value = t2->entry.value;
     }
 }
 void insert_tree(tree_t *t, tree_t *t2)
@@ -180,7 +184,7 @@ void _print_tree(tree_t *t, int depth)
     memcpy(buf, "+ ", 2);
     buf = &buffer[i*2+2];
     char valbuf[10];
-    sprintf(valbuf, "%s:%d", t->entry.key, t->entry.value);
+    sprintf(valbuf, "%s:%d", t->entry->key, t->entry->value);
     memcpy(buf, valbuf, 10);
     printf("%s\n", buffer);
     if (t->left != NULL) {
@@ -245,4 +249,60 @@ void traverse_tree(tree_t *t, void (*f)(tree_t *t))
         traverse_tree(t->right, f);
     }
     f(t);
+}
+
+entry_t* find(tree_t *t, const char *key)
+{
+    if (t == NULL || t->entry == NULL) {
+        return NULL;
+    }
+    int a = strcmp(t->entry->key, key);
+    if (0 < a) {
+        if (t->left != NULL) {
+            return find(t->left, key);
+        } else {
+            return NULL;
+        }
+    } else if (0 > a) {
+        if (t->right != NULL) {
+            return find(t->right, key);
+        } else {
+            return NULL;
+        }
+    } else if (0 == a) {
+        return t->entry;
+    }
+    return NULL;
+}
+
+entry_t* get(dict_t *d, const char *key)
+{
+    return find(d->tree, key);
+}
+
+int set(dict_t *d, const char *key, int value)
+{
+    entry_t *e = malloc(sizeof(*e));
+    e->key = key;
+    e->value = value;
+    insert(d->tree, e);
+    return value;
+}
+
+tree_t new_tree(const char *key, int value)
+{
+    entry_t *e = malloc(sizeof(*e));
+    tree_t *t = malloc(sizeof(*t));
+    e->key = key;
+    e->value = value;
+    t->entry = e;
+    return *t;
+}
+
+dict_t new_dict()
+{
+    dict_t *d = malloc(sizeof(*d));
+    tree_t *t = malloc(sizeof(*t));
+    d->tree = t;
+    return *d;
 }

@@ -10,18 +10,18 @@ void assert_avl(tree_t *t)
 
 void print_bias(tree_t *t)
 {
-  printf("bias(t(%s=>%d)) = %d\n", t->entry.key, t->entry.value, bias(t));
+  printf("bias(t(%s=>%d)) = %d\n", t->entry->key, t->entry->value, bias(t));
 }
 
 void test_valid_avl()
 {
-    tree_t root = { .entry = {.key = "b", .value = 5} };
-    tree_t l    = { .entry = {.key = "a", .value = 1} };
-    tree_t r    = { .entry = {.key = "f", .value = 50 } };
-    tree_t rl   = { .entry = {.key = "d", .value = 30 } };
-    tree_t rr   = { .entry = {.key = "g", .value = 100 } };
-    tree_t rll  = { .entry = {.key = "c", .value = 20 } };
-    tree_t rlr  = { .entry = {.key = "e", .value = 40 } };
+    tree_t root = new_tree("b", 5);
+    tree_t l    = new_tree("a", 1);
+    tree_t r    = new_tree("f", 50);
+    tree_t rl   = new_tree("d", 30);
+    tree_t rr   = new_tree("g", 100);
+    tree_t rll  = new_tree("c", 20);
+    tree_t rlr  = new_tree("e", 40);
     insert_tree(&root, &l);
     insert_tree(&root, &r);
     insert_tree(&root, &rl);
@@ -39,13 +39,13 @@ void test_valid_avl()
 
 void test_valid_avl2()
 {
-    tree_t root = { .entry = {.key = "10", .value = 10 } };
-    tree_t l    = { .entry = {.key = "5", .value = 5 } };
-    tree_t r    = { .entry = {.key = "4", .value = 4 } };
-    tree_t rl   = { .entry = {.key = "3", .value = 3 } };
-    tree_t rll  = { .entry = {.key = "2", .value = 2 } };
-    tree_t rlr  = { .entry = {.key = "1", .value = 1 } };
-    tree_t rr   = { .entry = {.key = "0", .value = 0 } };
+    tree_t root = new_tree("10", 10);
+    tree_t l    = new_tree("5", 5);
+    tree_t r    = new_tree("4", 4);
+    tree_t rl   = new_tree("3", 3);
+    tree_t rll  = new_tree("2", 2);
+    tree_t rlr  = new_tree("1", 1);
+    tree_t rr   = new_tree("0", 0);
     insert_tree(&root, &l);
     insert_tree(&root, &r);
     insert_tree(&root, &rl);
@@ -57,7 +57,7 @@ void test_valid_avl2()
 
 void print_value(tree_t *t)
 {
-    printf("value: %d\n", t->entry.value);
+    printf("value: %d\n", t->entry->value);
 }
 
 int is_avl(tree_t *t)
@@ -68,9 +68,9 @@ int is_avl(tree_t *t)
 
 void test_height()
 {
-    tree_t t = { .entry = {.key = "b", .value = 10 } };
-    tree_t t2 = { .entry = {.key = "a", .value = 5 } };
-    tree_t t3 = { .entry = {.key = "c", .value = 15 } };
+    tree_t t = new_tree("b", 10);
+    tree_t t2 = new_tree("a", 5);
+    tree_t t3 = new_tree("c", 15);
     CU_ASSERT(1 == tree_height(&t));
     insert_tree(&t, &t2);
     CU_ASSERT(2 == tree_height(&t));
@@ -80,9 +80,9 @@ void test_height()
 
 void test_insert_tree()
 {
-    tree_t t1 = { .entry = {.key = "g", .value = 10 } };
-    tree_t t2 = { .entry = {.key = "c", .value = 5 } };
-    tree_t t3 = { .entry = {.key = "a", .value = 4 } };
+    tree_t t1 = new_tree("g", 10);
+    tree_t t2 = new_tree("c", 5);
+    tree_t t3 = new_tree("a", 4);
     insert_tree(&t1, &t2);
     insert_tree(&t1, &t3);
     CU_ASSERT(t1.parent == &t2);
@@ -96,6 +96,16 @@ void test_insert_tree()
     CU_ASSERT(t3.right == NULL);
 }
 
+void test_get_set()
+{
+    dict_t dict = new_dict();
+    entry_t *e1 = get(&dict, "foo");
+    CU_ASSERT(e1 == NULL);
+    CU_ASSERT(set(&dict, "foo", 70) == 70);
+    entry_t *e2 = get(&dict, "foo");
+    CU_ASSERT(e2->value == 70);
+}
+
 int main()
 {
     CU_pSuite suite;
@@ -105,6 +115,8 @@ int main()
     CU_add_test(suite, "valid_val_tree2", test_valid_avl2);
     CU_add_test(suite, "test tree_height", test_height);
     CU_add_test(suite, "test insert_tree", test_insert_tree);
+
+    CU_add_test(suite, "test dict get set", test_get_set);
 
     CU_basic_run_tests();
     CU_cleanup_registry();
