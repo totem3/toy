@@ -1,6 +1,9 @@
 #include "./avltree.h"
 #include <CUnit/CUnit.h>
 #include <CUnit/Basic.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int is_avl(tree_t*);
 void assert_avl(tree_t *t)
@@ -106,19 +109,55 @@ void test_get_set()
     CU_ASSERT(e2->value == 70);
 }
 
+char* rand_string(char *str, size_t size)
+{
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (size) {
+        --size;
+        for (size_t n = 0; n < size; n++) {
+            int key = rand() % (int) (sizeof charset - 1);
+            str[n] = charset[key];
+        }
+        str[size] = '\0';
+    }
+    return str;
+}
+
+void test_many_set()
+{
+    dict_t d = new_dict();
+    set(&d, "foo", 1);
+    int i;
+    size_t key_length = 16;
+    for (i = 0; i < 1; i++) {
+        fprintf(stderr, "i = %d\n", i);
+        struct timeval tp;
+        gettimeofday(&tp, NULL);
+        srandom(tp.tv_usec);
+        int value = (int)random();
+        char *key = malloc(key_length);
+        rand_string(key, key_length);
+        set(&d, "a", 1);
+    }
+    printf("set done\n");
+    sleep(10);
+}
+
 int main()
 {
-    CU_pSuite suite;
-    CU_initialize_registry();
-    suite = CU_add_suite("avl tree suite", NULL, NULL);
-    CU_add_test(suite, "valid_val_tree", test_valid_avl);
-    CU_add_test(suite, "valid_val_tree2", test_valid_avl2);
-    CU_add_test(suite, "test tree_height", test_height);
-    CU_add_test(suite, "test insert_tree", test_insert_tree);
+    /* CU_pSuite suite; */
+    /* CU_initialize_registry(); */
+    /* suite = CU_add_suite("avl tree suite", NULL, NULL); */
+    /* CU_add_test(suite, "valid_val_tree", test_valid_avl); */
+    /* CU_add_test(suite, "valid_val_tree2", test_valid_avl2); */
+    /* CU_add_test(suite, "test tree_height", test_height); */
+    /* CU_add_test(suite, "test insert_tree", test_insert_tree); */
 
-    CU_add_test(suite, "test dict get set", test_get_set);
+    /* CU_add_test(suite, "test dict get set", test_get_set); */
+    test_many_set();
+    /* CU_add_test(suite, "test dict many set", test_many_set); */
 
-    CU_basic_run_tests();
-    CU_cleanup_registry();
+    /* CU_basic_run_tests(); */
+    /* CU_cleanup_registry(); */
     return 0;
 }

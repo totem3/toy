@@ -293,6 +293,9 @@ tree_t new_tree(const char *key, int value)
 {
     entry_t *e = malloc(sizeof(*e));
     tree_t *t = malloc(sizeof(*t));
+    t->left = NULL;
+    t->right = NULL;
+    t->parent = NULL;
     e->key = key;
     e->value = value;
     t->entry = e;
