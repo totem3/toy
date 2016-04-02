@@ -97,12 +97,17 @@ void insert(tree_t *t, entry_t *entry)
 
 void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
 {
-    if (t->entry == NULL || 0 == strcmp(t->entry->key, t2->entry->key)) {
-        entry_t *e = malloc(sizeof(*e));
+    if (t->entry == NULL) {
+        t = t2;
+        return;
+    }
+    int cmp = strcmp(t->entry->key, t2->entry->key);
+    if (0 == cmp) {
+        entry_t *e = malloc(sizeof(struct entry));
         e->key = t2->entry->key;
         e->value = t2->entry->value;
         t->entry = e;
-    } else if (0 < strcmp(t->entry->key, t2->entry->key)) {
+    } else if (0 < cmp) {
         if (t->left == NULL) {
             t->left = t2;
             t2->parent = t;
@@ -112,7 +117,7 @@ void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
         } else {
             _insert_tree(t->left, t2, change, v);
         }
-    } else if (0 > strcmp(t->entry->key, t2->entry->key)) {
+    } else if (0 > cmp) {
         if (t->right == NULL) {
             t->right = t2;
             t2->parent = t;
@@ -282,7 +287,7 @@ entry_t* get(dict_t *d, const char *key)
 
 int set(dict_t *d, const char *key, int value)
 {
-    entry_t *e = malloc(sizeof(*e));
+    entry_t *e = malloc(sizeof(struct entry));
     e->key = key;
     e->value = value;
     insert(d->tree, e);
@@ -291,8 +296,8 @@ int set(dict_t *d, const char *key, int value)
 
 tree_t new_tree(const char *key, int value)
 {
-    entry_t *e = malloc(sizeof(*e));
-    tree_t *t = malloc(sizeof(*t));
+    entry_t *e = malloc(sizeof(struct entry));
+    tree_t *t = malloc(sizeof(struct tree));
     t->left = NULL;
     t->right = NULL;
     t->parent = NULL;
@@ -304,8 +309,8 @@ tree_t new_tree(const char *key, int value)
 
 dict_t new_dict()
 {
-    dict_t *d = malloc(sizeof(*d));
-    tree_t *t = malloc(sizeof(*t));
+    dict_t *d = malloc(sizeof(struct dict));
+    tree_t *t = malloc(sizeof(struct tree));
     d->tree = t;
     return *d;
 }

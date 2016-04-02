@@ -126,21 +126,20 @@ char* rand_string(char *str, size_t size)
 void test_many_set()
 {
     dict_t d = new_dict();
-    set(&d, "foo", 1);
     int i;
     size_t key_length = 16;
-    for (i = 0; i < 1; i++) {
-        fprintf(stderr, "i = %d\n", i);
-        struct timeval tp;
-        gettimeofday(&tp, NULL);
-        srandom(tp.tv_usec);
-        int value = (int)random();
-        char *key = malloc(key_length);
-        rand_string(key, key_length);
-        set(&d, "a", 1);
+    char keys[16][10];
+    for (i = 0; i < 10; i++) {
+        /* struct timeval tp; */
+        /* gettimeofday(&tp, NULL); */
+        /* srandom(tp.tv_usec); */
+        int value = i;
+        sprintf(keys[i], "%08d", i);
+        /* rand_string(key, key_length); */
+        printf("key %s %d\n", keys[i], value);
+        set(&d, keys[i], value);
     }
     printf("set done\n");
-    sleep(10);
 }
 
 int main()
