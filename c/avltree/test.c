@@ -117,24 +117,8 @@ void test_get_set()
         CU_ASSERT(e4->value == 24);
 }
 
-int main()
+void test_large_set_get()
 {
-
-    CU_pSuite suite;
-    CU_initialize_registry();
-    suite = CU_add_suite("avl tree suite", NULL, NULL);
-    CU_add_test(suite, "valid_val_tree", test_valid_avl);
-    CU_add_test(suite, "valid_val_tree2", test_valid_avl2);
-    CU_add_test(suite, "test tree_height", test_height);
-    CU_add_test(suite, "test insert_tree", test_insert_tree);
-    CU_add_test(suite, "test dict get set", test_get_set);
-
-    printf("sizeof tree_t* = %lu\n", sizeof(tree_t*));
-    printf("sizeof tree_t = %lu\n", sizeof(tree_t));
-    printf("sizeof entry_t = %lu\n", sizeof(entry_t));
-    printf("sizeof int = %lu\n", sizeof(int));
-    printf("sizeof const char* = %lu\n", sizeof(char*));
-    printf("sizeof dict_t = %lu\n", sizeof(dict_t));
     dict_t *d = new_dict();
     char keys[1000000][8];
     memset(keys, 0, sizeof(keys));
@@ -144,7 +128,6 @@ int main()
         set(d, keys[i], i);
         /* printf("inserted\n"); */
     }
-
     tree_t *root = d->tree;
     printf("%s => %d\n", root->entry->key, root->entry->value);
     if (root->left != NULL) {
@@ -157,7 +140,6 @@ int main()
     } else {
         printf("right is null\n");
     }
-
     for (int i = 0; i < 1000000; i++) {
         entry_t *e = get(d, keys[i]);
         if (e == NULL) {
@@ -167,8 +149,22 @@ int main()
         }
     }
 
-    printf("done\n");
+}
+
+int main()
+{
+
+    CU_pSuite suite;
+    CU_initialize_registry();
+    suite = CU_add_suite("avl tree suite", NULL, NULL);
+    CU_add_test(suite, "valid_val_tree", test_valid_avl);
+    CU_add_test(suite, "valid_val_tree2", test_valid_avl2);
+    CU_add_test(suite, "test tree_height", test_height);
+    CU_add_test(suite, "test insert_tree", test_insert_tree);
+    CU_add_test(suite, "test dict get set", test_get_set);
+    CU_add_test(suite, "test large dict get set", test_large_set_get);
     CU_basic_run_tests();
     CU_cleanup_registry();
+
     return 0;
 }
