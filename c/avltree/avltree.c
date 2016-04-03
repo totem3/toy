@@ -89,7 +89,8 @@ int bias(tree_t *t)
 
 void insert(tree_t *t, entry_t *entry)
 {
-    tree_t *t2 = malloc(sizeof(tree_t*));
+    tree_t *t2 = (tree_t*)malloc(sizeof(tree_t*));
+    memset(t2, 0, sizeof(tree_t));
     t2->entry = entry;
 
     insert_tree(t, t2);
@@ -98,17 +99,14 @@ void insert(tree_t *t, entry_t *entry)
 void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
 {
     if (t->entry == NULL || 0 == strcmp(t->entry->key, t2->entry->key)) {
-        entry_t *e = malloc(sizeof(*e));
-        e->key = t2->entry->key;
-        e->value = t2->entry->value;
-        t->entry = e;
+        t->entry = t2->entry;
     } else if (0 < strcmp(t->entry->key, t2->entry->key)) {
         if (t->left == NULL) {
             t->left = t2;
             t2->parent = t;
-            int c = 1;
-            memcpy(change, &c, sizeof(c));
-            memcpy(v, &t, sizeof(*v));
+            memset(change, 0, sizeof(int));
+            memset(change, 1, 1);
+            memcpy(v, &t, sizeof(tree_t*));
         } else {
             _insert_tree(t->left, t2, change, v);
         }
@@ -116,9 +114,9 @@ void _insert_tree(tree_t *t, tree_t *t2, int *change, tree_t **v)
         if (t->right == NULL) {
             t->right = t2;
             t2->parent = t;
-            int c = 1;
-            memcpy(change, &c, sizeof(c));
-            memcpy(v, &t, sizeof(*v));
+            memset(change, 0, sizeof(int));
+            memset(change, 1, 1);
+            memcpy(v, &t, sizeof(tree_t*));
         } else {
             _insert_tree(t->right, t2, change, v);
         }
@@ -133,30 +131,29 @@ void insert_tree(tree_t *t, tree_t *t2)
 
     while (c) {
         int b = bias(t);
-        int f = 0;
         if (b == 1 || b == -1) {
         } else if (b == 0) {
-            memcpy(&c, &f, sizeof(c));
+            memset(&c, 0, sizeof(int));
         } else if (b == 2) {
             switch (bias(t->left)) {
                 case 1:
                     rotateR(t);
-                    memcpy(&c, &f, sizeof(c));
+                    memset(&c, 0, sizeof(int));
                     break;
                 case -1:
                     rotateLR(t);
-                    memcpy(&c, &f, sizeof(c));
+                    memset(&c, 0, sizeof(int));
                     break;
             }
         } else if (b == -2) {
             switch (bias(t->right)) {
                 case -1:
                     rotateL(t);
-                    memcpy(&c, &f, sizeof(c));
+                    memset(&c, 0, sizeof(int));
                     break;
                 case 1:
                     rotateRL(t);
-                    memcpy(&c, &f, sizeof(c));
+                    memset(&c, 0, sizeof(int));
                     break;
             }
         }
@@ -282,27 +279,35 @@ entry_t* get(dict_t *d, const char *key)
 
 int set(dict_t *d, const char *key, int value)
 {
-    entry_t *e = malloc(sizeof(*e));
-    e->key = key;
-    e->value = value;
-    insert(d->tree, e);
-    return value;
-}
-
-tree_t new_tree(const char *key, int value)
-{
-    entry_t *e = malloc(sizeof(*e));
-    tree_t *t = malloc(sizeof(*t));
+    entry_t *e = (entry_t*)malloc(sizeof(entry_t));
+    tree_t *t = malloc(sizeof(tree_t));
+    memset(e, 0, sizeof(entry_t));
+    memset(t, 0, sizeof(tree_t));
     e->key = key;
     e->value = value;
     t->entry = e;
-    return *t;
+    insert_tree(d->tree, t);
+    return value;
 }
 
-dict_t new_dict()
+tree_t *new_tree(const char *key, int value)
 {
-    dict_t *d = malloc(sizeof(*d));
-    tree_t *t = malloc(sizeof(*t));
+    entry_t *e = (entry_t*)malloc(sizeof(entry_t));
+    memset(e, 0, sizeof(entry_t));
+    tree_t *t = (tree_t*)malloc(sizeof(tree_t));
+    memset(t, 0, sizeof(tree_t));
+    e->key = key;
+    e->value = value;
+    t->entry = e;
+    return t;
+}
+
+dict_t *new_dict()
+{
+    dict_t *d = (dict_t *)malloc(sizeof(dict_t));
+    tree_t *t = (tree_t *)malloc(sizeof(tree_t));
+    memset(d, 0, sizeof(dict_t));
+    memset(t, 0, sizeof(tree_t));
     d->tree = t;
-    return *d;
+    return d;
 }
