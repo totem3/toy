@@ -120,9 +120,10 @@ void test_get_set()
 void test_large_set_get()
 {
     dict_t *d = new_dict();
-    char keys[1000000][8];
+    int TIMES = 100000;
+    char keys[TIMES][8];
     memset(keys, 0, sizeof(keys));
-    for (int i = 0; i < 1000000; i++) {
+    for (int i = 0; i < TIMES; i++) {
         /* printf("i %d\n", i); */
         sprintf(keys[i], "%d", i);
         set(d, keys[i], i);
@@ -140,7 +141,7 @@ void test_large_set_get()
     } else {
         printf("right is null\n");
     }
-    for (int i = 0; i < 1000000; i++) {
+    for (int i = 0; i < TIMES; i++) {
         entry_t *e = get(d, keys[i]);
         if (e == NULL) {
             /* printf("e = null\n"); */
