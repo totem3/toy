@@ -287,6 +287,9 @@ int set(dict_t *d, const char *key, int value)
     e->value = value;
     t->entry = e;
     insert_tree(d->tree, t);
+    while(d->tree->parent != NULL) {
+        d->tree = d->tree->parent;
+    }
     return value;
 }
 
