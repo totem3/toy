@@ -145,7 +145,7 @@ void test_get_set()
 void test_large_set_get()
 {
     dict_t *d = new_dict();
-    int TIMES = 100000;
+    int TIMES = 1000000;
     char keys[TIMES][8];
     memset(keys, 0, sizeof(keys));
     for (int i = 0; i < TIMES; i++) {
