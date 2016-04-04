@@ -8,6 +8,7 @@ typedef struct tree {
     struct tree *left;
     struct tree *right;
     entry_t *entry;
+    int height;
 } tree_t;
 
 typedef struct dict {
