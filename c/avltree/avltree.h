@@ -21,6 +21,7 @@ void rotateRL(tree_t *t);
 void rotateLR(tree_t *t);
 void insert(tree_t *t, entry_t *e);
 void insert_tree(tree_t *t, tree_t *t2);
+void set_height (tree_t *t);
 int tree_height (tree_t *t);
 int bias (tree_t *t);
 void print_tree (tree_t *t);

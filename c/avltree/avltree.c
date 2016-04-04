@@ -15,15 +15,21 @@ void rotateR(tree_t *t)
     }
 
     left->right = t;
-    t->parent = left;
     left->parent = parent;
     if (parent != NULL) {
-        parent->right = left;
+        if (parent->left == t) {
+            parent->left = left;
+        } else {
+            parent->right = left;
+        }
     }
+    t->parent = left;
     t->left = lr;
     if (lr != NULL) {
         lr->parent = t;
     }
+    set_height(t);
+    set_height(left);
 }
 
 void rotateL(tree_t *t)
@@ -38,15 +44,21 @@ void rotateL(tree_t *t)
     }
 
     right->left = t;
-    t->parent = right;
     right->parent = parent;
     if (parent != NULL) {
-        parent->left = right;
+        if (parent->left == t) {
+            parent->left = right;
+        } else {
+            parent->right = right;
+        }
     }
+    t->parent = right;
     t->right = rl;
     if (rl != NULL) {
         rl->parent = t;
     }
+    set_height(t);
+    set_height(right);
 }
 
 void rotateRL(tree_t *t)
@@ -59,6 +71,15 @@ void rotateLR(tree_t *t)
 {
     rotateL(t->left);
     rotateR(t);
+}
+
+void set_height(tree_t *t)
+{
+    if (t == NULL) return;
+
+    int l = (t->left == NULL) ? 0 : t->left->height;
+    int r = (t->right == NULL) ? 0 : t->right->height;
+    t->height = 1 + ((l >= r) ? l : r);
 }
 
 int tree_height(tree_t *t)
@@ -82,9 +103,9 @@ int tree_height(tree_t *t)
 
 int bias(tree_t *t)
 {
-    int left = tree_height(t->left);
-    int right = tree_height(t->right);
-    return left - right;
+    int l = (t->left == NULL) ? 0 : t->left->height;
+    int r = (t->right == NULL) ? 0 : t->right->height;
+    return l - r;
 }
 
 void insert(tree_t *t, entry_t *entry)
@@ -130,39 +151,39 @@ void insert_tree(tree_t *t, tree_t *t2)
     _insert_tree(t, t2, &c, &v);
 
     while (c) {
-        int b = bias(t);
+        int b = bias(v);
+        set_height(v);
         if (b == 1 || b == -1) {
         } else if (b == 0) {
-            memset(&c, 0, sizeof(int));
+            /* memset(&c, 0, sizeof(int)); */
         } else if (b == 2) {
-            switch (bias(t->left)) {
+            switch (bias(v->left)) {
                 case 1:
-                    rotateR(t);
-                    memset(&c, 0, sizeof(int));
+                    rotateR(v);
+                    /* memset(&c, 0, sizeof(int)); */
                     break;
                 case -1:
-                    rotateLR(t);
-                    memset(&c, 0, sizeof(int));
+                    rotateLR(v);
+                    /* memset(&c, 0, sizeof(int)); */
                     break;
             }
         } else if (b == -2) {
-            switch (bias(t->right)) {
+            switch (bias(v->right)) {
                 case -1:
-                    rotateL(t);
-                    memset(&c, 0, sizeof(int));
+                    rotateL(v);
+                    /* memset(&c, 0, sizeof(int)); */
                     break;
                 case 1:
-                    rotateRL(t);
-                    memset(&c, 0, sizeof(int));
+                    rotateRL(v);
+                    /* memset(&c, 0, sizeof(int)); */
                     break;
             }
         }
-        if (t == NULL || t->parent == NULL) {
+        if (v == NULL || v->parent == NULL) {
             break;
         }
-        t = t->parent;
+        v = v->parent;
     }
-
 }
 
 void _print_tree(tree_t *t, int depth)
@@ -286,6 +307,7 @@ int set(dict_t *d, const char *key, int value)
     e->key = key;
     e->value = value;
     t->entry = e;
+    t->height = 1;
     insert_tree(d->tree, t);
     while(d->tree->parent != NULL) {
         d->tree = d->tree->parent;
@@ -302,6 +324,7 @@ tree_t *new_tree(const char *key, int value)
     e->key = key;
     e->value = value;
     t->entry = e;
+    t->height = 1;
     return t;
 }
 
@@ -312,5 +335,6 @@ dict_t *new_dict()
     memset(d, 0, sizeof(dict_t));
     memset(t, 0, sizeof(tree_t));
     d->tree = t;
+    t->height = 1;
     return d;
 }

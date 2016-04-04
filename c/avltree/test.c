@@ -94,6 +94,31 @@ void test_insert_tree()
     CU_ASSERT(t3->right == NULL);
 }
 
+void test_bias_insert()
+{
+    dict_t *d = new_dict();
+    set(d, "1", 1);
+    CU_ASSERT(d->tree->height == 1);
+    set(d, "2", 2);
+    CU_ASSERT(d->tree->height == 2);
+    set(d, "3", 3);
+    CU_ASSERT(d->tree->height == 2);
+    set(d, "4", 4);
+    CU_ASSERT(d->tree->height == 3);
+    set(d, "5", 5);
+    CU_ASSERT(d->tree->height == 3);
+    set(d, "6", 6);
+    CU_ASSERT(d->tree->height == 3);
+    set(d, "7", 7);
+    CU_ASSERT(d->tree->height == 3);
+    set(d, "8", 8);
+    CU_ASSERT(d->tree->height == 4);
+    set(d, "9", 9);
+    CU_ASSERT(d->tree->height == 4);
+    set(d, "10", 10);
+    CU_ASSERT(d->tree->height == 4);
+}
+
 void test_get_set()
 {
     dict_t *dict = new_dict();
@@ -130,23 +155,12 @@ void test_large_set_get()
         /* printf("inserted\n"); */
     }
     tree_t *root = d->tree;
-    printf("%s => %d\n", root->entry->key, root->entry->value);
-    if (root->left != NULL) {
-        printf("%s => %d\n", root->left->entry->key, root->left->entry->value);
-    } else {
-        printf("left is null\n");
-    }
-    if (root->right != NULL) {
-        printf("%s => %d\n", root->right->entry->key, root->right->entry->value);
-    } else {
-        printf("right is null\n");
-    }
     for (int i = 0; i < TIMES; i++) {
         entry_t *e = get(d, keys[i]);
         if (e == NULL) {
             /* printf("e = null\n"); */
         } else {
-            printf("key: %s, value: %d\n", e->key, e->value);
+            CU_ASSERT(e->value == i);
         }
     }
 
@@ -163,6 +177,7 @@ int main()
     CU_add_test(suite, "test tree_height", test_height);
     CU_add_test(suite, "test insert_tree", test_insert_tree);
     CU_add_test(suite, "test dict get set", test_get_set);
+    CU_add_test(suite, "test biased insert", test_bias_insert);
     CU_add_test(suite, "test large dict get set", test_large_set_get);
     CU_basic_run_tests();
     CU_cleanup_registry();
