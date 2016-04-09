@@ -65,6 +65,7 @@ unsigned int dictGenHashFunction(const void *key, int len) {
 typedef struct entry {
     const char *key;
     int value;
+    Entry *next;
 } Entry;
 
 typedef struct hash_table {
