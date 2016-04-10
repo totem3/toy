@@ -65,7 +65,7 @@ unsigned int dictGenHashFunction(const void *key, int len) {
 typedef struct entry {
     const char *key;
     int value;
-    Entry *next;
+    struct entry *next;
 } Entry;
 
 typedef struct hash_table {
@@ -86,6 +86,10 @@ void set(Map *m, const char *key, int value)
     /* int index = dictGenHashFunction(key, sizeof(key)) % TABLE_SIZE; */
     if (m->entries[index].key != NULL) {
         collision_count++;
+        Entry *e = malloc(sizeof(Entry));
+        e->key = key;
+        e->value = value;
+        m->entries[index].next = e;
         /* printf("key collision: %s & %s\n", key, m->entries[index].key); */
     }
     m->entries[index].key = key;
