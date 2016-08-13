@@ -28,7 +28,7 @@ impl IntoIterator for Group {
 }
 
 struct Iter<'a> {
-    iter: std::slice::Iter<'a, Person>,
+    iter: ::std::slice::Iter<'a, Person>,
 }
 
 impl<'a> Iterator for Iter<'a> {
