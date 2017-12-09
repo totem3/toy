@@ -1,0 +1,7 @@
+[package]
+name = "timee"
+version = "0.1.0"
+authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
+
+[dependencies]
+time = "*"
