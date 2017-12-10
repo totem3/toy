@@ -1,0 +1,8 @@
+[package]
+name = "huffman"
+version = "0.1.0"
+authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
+
+[dev-dependencies]
+quickcheck = "0.4"
+quickcheck_macros = "0.4"
