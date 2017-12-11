@@ -88,7 +88,7 @@ impl HuffTree {
 
 impl PartialEq for HuffTree {
     fn eq(&self, other: &HuffTree) -> bool {
-        self.occurrences == other.occurrences
+        self.occurrences == other.occurrences && self.value == other.value
     }
 }
 
@@ -103,7 +103,11 @@ impl PartialOrd for HuffTree {
 
 impl Ord for HuffTree {
     fn cmp(&self, other: &HuffTree) -> Ordering {
-        other.occurrences.cmp(&self.occurrences)
+        if other.occurrences == self.occurrences {
+            other.value.cmp(&self.value)
+        } else {
+            other.occurrences.cmp(&self.occurrences)
+        }
     }
 }
 
@@ -129,7 +133,7 @@ fn build_tree<'a>(data: &'a [u8]) -> (CodeInfo, RevCodeInfo) {
                 };
                 v.push(t);
             } else {
-                heap.push(h1);
+                v.push(h1);
                 break;
             }
         } else {
@@ -142,7 +146,7 @@ fn build_tree<'a>(data: &'a [u8]) -> (CodeInfo, RevCodeInfo) {
                 };
                 v.push(t);
             } else {
-                heap.push(h1);
+                v.push(h1);
                 break;
             }
         }
@@ -182,7 +186,7 @@ fn encode<'a>(data: &'a [u8], tree: &CodeInfo) -> Vec<u8> {
     let mut result = Vec::new();
     let mut bitpos = 0;
     for v in data {
-        let code = tree.get(v).expect("unknwon code");
+        let code = tree.get(v).expect(&format!("unknown code: {}", v));
         let width = bitwidth(code);
         let cb_pos = bitpos % 8;
         let shift = (8 - (cb_pos as isize)) - (width as isize);
@@ -206,9 +210,6 @@ fn encode<'a>(data: &'a [u8], tree: &CodeInfo) -> Vec<u8> {
             result.push(rest << (8 - restwidth));
         }
         bitpos += width;
-        for r in &result {
-            print!("{:08b} ", r);
-        }
     }
     result
 }
@@ -233,23 +234,33 @@ fn decode<'a>(data: &'a [u8], tree: &CodeInfo, len: usize) -> Vec<u8> {
 }
 
 fn main() {
-    let data = b"abcadbcdfabaa";
-    let (tree, rev) = build_tree(data);
-    let encoded = encode(data, &tree);
+    let data = [0, 1, 2, 3, 4, 5, 6, 7];
+    let (tree, rev) = build_tree(&data);
+    let encoded = encode(&data, &tree);
     let len = data.len();
     let decoded = decode(&encoded, &rev, len);
-    let data = "abcadbcdfabaa";
+    for i in 0..data.len() {
+        assert_eq!(data[i], decoded[i]);
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::io::Write;
     use super::{build_tree, encode, decode};
 
     quickcheck! {
         fn prop(s: Vec<u8>) -> bool {
-            let data = &s[..];
+            let data = if s.len() > 8 {
+                &s[0..8]
+            } else {
+                &s[..]
+            };
             let (tree, rev) = build_tree(data);
-            decode(&encode(data, &tree), &rev, data.len()) == data
+            let result = decode(&encode(data, &tree), &rev, data.len());
+            writeln!(::std::io::stderr(), "result: {:?}", result);
+            writeln!(::std::io::stderr(), "data  : {:?}", data);
+            result == data
         }
     }
 
