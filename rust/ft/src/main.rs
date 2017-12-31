@@ -45,9 +45,9 @@ fn ifftn<D: Dimension>(input: &mut ArrayViewMut<Complex<f64>, D>, output: &mut A
 
 fn _fftn<D: Dimension>(input: &mut ArrayViewMut<Complex<f64>, D>, output: &mut ArrayViewMut<Complex<f64>, D>, axis: usize, inverse: bool) {
     if inverse {
-        mutate_axis(input, output, ifft, axis)
+        mutate_lane(input, output, ifft, axis)
     } else {
-        mutate_axis(input, output, fft, axis)
+        mutate_lane(input, output, fft, axis)
     }
 }
 
@@ -123,7 +123,7 @@ fn spectral(img: &DynamicImage) -> Vec<Complex<f64>> {
     // normalize(shifted)
 }
 
-fn mutate_axis<T: Zero + Clone + Debug, D: Dimension>(input: &mut ArrayViewMut<T, D>, output: &mut ArrayViewMut<T, D>, f: fn(&mut [T], &mut [T]) -> (), axis: usize) {
+fn mutate_lane<T: Zero + Clone + Debug, D: Dimension>(input: &mut ArrayViewMut<T, D>, output: &mut ArrayViewMut<T, D>, f: fn(&mut [T], &mut [T]) -> (), axis: usize) {
     if axis > 0 {
         input.swap_axes(0, axis);
         output.swap_axes(0, axis);
@@ -274,7 +274,7 @@ fn _main() {
 
 #[cfg(test)]
 mod test {
-    use super::{fft, ifft, fft2, ifft2, mutate_axis, low_pass_filter, shift};
+    use super::{fft, ifft, fft2, ifft2, mutate_lane, low_pass_filter, shift};
     use ndarray::{Array, ArrayViewMut, Axis, Dimension};
     use rustfft::FFTplanner;
     use rustfft::num_complex::Complex;
@@ -393,7 +393,7 @@ mod test {
         {
             let mut input = ArrayViewMut::from_shape((3,3), &mut a).unwrap();
             let mut output = ArrayViewMut::from_shape((3,3), &mut b).unwrap();
-            mutate_axis(&mut input, &mut output, f, 1);
+            mutate_lane(&mut input, &mut output, f, 1);
         }
         assert_eq!(b, vec![ 3,  5,  7,
                             6,  8, 10,
@@ -415,7 +415,7 @@ mod test {
         {
             let mut input = ArrayViewMut::from_shape((3,3), &mut a).unwrap();
             let mut output = ArrayViewMut::from_shape((3,3), &mut b).unwrap();
-            mutate_axis(&mut input, &mut output, f, 0);
+            mutate_lane(&mut input, &mut output, f, 0);
         }
         assert_eq!(b, vec![ 1,  2,  3,
                             7,  8,  9,
@@ -425,7 +425,7 @@ mod test {
         {
             let mut input = ArrayViewMut::from_shape((3,3), &mut a).unwrap();
             let mut output = ArrayViewMut::from_shape((3,3), &mut b).unwrap();
-            mutate_axis(&mut input, &mut output, f, 1);
+            mutate_lane(&mut input, &mut output, f, 1);
         }
         assert_eq!(b, vec![ 8, 10, 12,
                            14, 16, 18,
