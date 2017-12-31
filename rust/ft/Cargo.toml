@@ -7,3 +7,4 @@ authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
 rustfft = "2.0.0"
 image = "0.18.0"
 ndarray = "0.10.13"
+stdweb = "0.2.0"
