@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
 
 [dependencies]
+ofuton = "0.1.0"
 rustfft = "2.0.0"
 image = "0.18.0"
 ndarray = "0.10.13"
