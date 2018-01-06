@@ -1,0 +1,11 @@
+[package]
+name = "derive-read-cstruct"
+version = "0.1.0"
+authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "*"
+quote = "*"

@@ -1,0 +1,8 @@
+[package]
+name = "test-derive"
+version = "0.1.0"
+authors = ["Takafumi Hirata <takhirata6@gmail.com>"]
+
+[dependencies]
+nom = "3.2.1"
+derive-read-cstruct = {path = "../derive-read-cstruct"}
