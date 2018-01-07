@@ -16,14 +16,12 @@ pub fn command_parser(input: TokenStream) -> TokenStream {
 fn impl_parser(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
     let body = &ast.body;
-    let mut fields1 = vec![];
-    let mut fields2 = vec![];
+    let mut fields = vec![];
     let mut tys = vec![];
     if let &syn::Body::Struct(ref variant) = body {
         for field in variant.fields() {
             if let Some(ref idt) = field.ident {
-                fields1.push(idt);
-                fields2.push(idt);
+                fields.push(idt);
             }
             if let syn::Ty::Path(_, ref path) = field.ty {
                 for seg in &path.segments {
@@ -41,8 +39,8 @@ fn impl_parser(ast: &syn::DeriveInput) -> quote::Tokens {
             type Item = #name;
             fn parse(input: &[u8]) -> IResult<&[u8], Self::Item> {
                 do_parse!(input,
-                    #(#fields1: #tys)>>*>>
-                    (#name{#(#fields2),*})
+                    #(#fields: #tys)>>*>>
+                    (#name{#(#fields),*})
                 )
             }
         }
