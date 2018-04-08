@@ -1,0 +1,8 @@
+ini <- pair+ eof
+pair <- ident equal ident
+ident <- <[a-z]+> spacing { printf("ident: %s\n", (char*)yytext); }
+equal <- "="
+spacing <- (space)*
+space <- ' ' / '\t' / eol
+eol <- '\r\n' / '\n' / '\r'
+eof <- !.

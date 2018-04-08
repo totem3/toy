@@ -1,0 +1,45 @@
+%{
+#include <stdio.h>
+#include "iniparse.h"
+
+union value {
+  char	 *string;
+};
+
+# define YYSTYPE union value
+%}
+
+ini = (pair | section)+ eof
+pair = k:ident equal v:ident {
+  ini_entry_t *entry = (ini_entry_t*)malloc(sizeof(ini_entry_t));
+  // ini_entry_t entry = {"", "", NULL};
+  entry->section = (char*)malloc(strlen(c_section)+1);
+  strcpy(entry->section, c_section);
+  entry->key = k.string;
+  entry->value = v.string;
+  list_add(&entry->_list, &config._list);
+}
+
+section = "[" <(! "]" .)+> "]" spacing {
+  union value v;
+  char *rv = (char*)malloc(strlen(yytext) + 1);
+  strcpy(rv, (char*)yytext);
+  v.string = rv;
+  strcpy(c_section, rv);
+  $$ = v;
+}
+
+ident = <[a-z]+> spacing {
+  union value v;
+  char *rv = (char*)malloc(strlen(yytext) + 1);
+  strcpy(rv, (char*)yytext);
+  v.string = rv;
+  $$ = v;
+}
+
+equal = "="
+spacing = (space | comment)*
+comment = ";" (! eol .)* eol
+space = ' ' | '\t' | eol
+eol = '\r\n' | '\n' | '\r'
+eof = !.

@@ -4,3 +4,6 @@ target/
 *.dSYM/
 
 *.o
+
+c/peg/ini/iniparse
+c/peg/ini/iniparse.c
